@@ -1,8 +1,8 @@
- “CyberEagle : Network Scanning Tools” 
+ “Netra : Network Scanning Tools” 
 
 Description: 
 
-The proposed project “Cyber Eagle “is a robust network scanning tool with a graphical user interface (GUI) like Zenmap. The tool will provide users with an intuitive interface for conducting network scans, identifying service version, and identifying potential security vulnerabilities. 
+The proposed project “Netra“is a robust network scanning tool with a graphical user interface (GUI) like Zenmap. The tool will provide users with an intuitive interface for conducting network scans, identifying service version, and identifying potential security vulnerabilities. 
 
  
 
@@ -53,10 +53,8 @@ Target Audience and Operating Systems:
     Supported OS: Linux, windows and macOS. 
 
  
-CyberEagle is a college project done for understanding how networking protocols and Nmap works.It was started from may 25, 2024
+Netra is a college project done for understanding how networking protocols and Nmap works.It was started from may 25, 2024.
 
-
- 
 
  
 
