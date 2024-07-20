@@ -36,11 +36,11 @@ Language and Tools Used to Create:
 
     Programming Language: Python 
 
-    GUI Framework: PyQt or Tkinter(HTML, CSS and Javascript and PHP, if created web-based) 
+    GUI Framework: Tkinter 
 
-    Network Scanning Library: Nmap (socket and scapy if needed) 
+    Network Scanning Library: Scapy,Socket
 
-    Development Environment: Visual Studio Code or PyCharm 
+    Development Environment: Visual Studio Code 
 
  
 
@@ -53,7 +53,7 @@ Target Audience and Operating Systems:
     Supported OS: Linux, windows and macOS. 
 
  
-Netra is a college project done for understanding how networking protocols and Nmap works.It was started from may 25, 2024.
+Netra is a college project done for understanding how networking protocols and Nmap works.It was projected to start from may 25, 2024 but start from june.
 
 
  
