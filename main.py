@@ -1,6 +1,10 @@
 from tkinter import *
 from tkinter import Menu, messagebox ,ttk , filedialog
-from scapy.all import ARP, Ether, sr
+from scapy.all import ARP, Ether, srp
+import ipaddress
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import socket
+import re
 
 
 # Create the main window
@@ -8,36 +12,13 @@ root = Tk()
 root.title("Network Scanner")
 root.geometry("600x600")
 
-
-# Functions for menu commands
-#funtios for new scan
-# def new_scan():
-#     hide_all_frames()
-#     new_scan_frame.pack(fill = "both" , expand = 1)
-#     active_device=Label(new_scan_frame, 
-#                  text="Active Devices", 
-#                  height= 3,
-                
-#                  font=('Helvetica', 14),  # Change font to 'Helvetica' with size 14
-#                  fg='blue')
-#     active_device.pack(fill='x')
-#     columns = ("Hostname" ,"IP Address","MAC Adress")
-#     table = ttk.Treeview(new_scan_frame,columns = columns , show = "headings")
-#     for col in columns :
-#         table.heading(col , text = col)
-#         table.column(col,anchor = "center")    
-#     table.pack(fill = "both", expand = 1)
-from scapy.all import *
-import ipaddress
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import socket
-
+#function to get local IP and local mac 
 def get_local_ip_and_mac():
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)
     local_mac = "AA:BB:CC:DD:DD:FF"
     return local_ip, local_mac
-
+#function to create and send ARP request
 def arp_request(ip):
     arp_request = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip)
     reply_arp, _ = srp(arp_request, timeout=3, verbose=False)
@@ -45,7 +26,7 @@ def arp_request(ip):
         for _, received in reply_arp:
             return received.psrc, received.hwsrc
     return None
-
+#function to scan the network with subnet
 def scan_network(subnet):
     active_devices = []
     local_ip, local_mac = get_local_ip_and_mac()
@@ -62,17 +43,36 @@ def scan_network(subnet):
                 print(f"An error occurred: {e}")
     return active_devices
 
-
+#createing a variable for subnet
 subnet_var = StringVar()
+#creating a function for new scan
 def new_scan():
     hide_all_frames()
     new_scan_frame.pack(fill="both", expand=1)
     subnet_label = Label(new_scan_frame , text = "Entet the Subnet[192.168.18.0/24]")
     subnet_label.pack()
     subnet = Entry(new_scan_frame,width= 20 , textvariable=subnet_var).pack()
-    submit_btn = Button(new_scan_frame,text = "Submit",width = 18 , command=scan).pack()
-   
+    submit_btn = Button(new_scan_frame,text = "Submit",width = 18 , command=validation_and_scan).pack()
 
+#ip subnet formating  using regex
+def validate_ip_subnet(ip_subnet):
+    # Regular expression for validating an IP address with subnet mask
+    pattern = re.compile(r"^(?:[0-9]{1,3}\.){2}[0-9]{1,3}\.0/(?:[0-9]|[1-2][0-9]|3[0-2])$")
+
+    return pattern.match(ip_subnet)
+
+#validating ip scan
+def validation_and_scan():
+    subnet = subnet_var.get()
+    if validate_ip_subnet(subnet):
+        scan()
+    else:
+        messagebox.showerror("Error","The IP address and subnet format is incorrect.")   
+
+#binding enter key for event triggering
+root.bind('<Return>', lambda event: validation_and_scan())
+
+#creating a actual scan funtion and printing the data
 def scan():
     hide_all_frames()
     new_scan_frame.pack(fill="both", expand=1)
@@ -101,6 +101,10 @@ def scan():
 
     table.pack(fill="both", expand=1)
 
+
+
+
+
 #creating a open file options  
 def open_scan_results():
     hide_all_frames()
@@ -121,7 +125,7 @@ def open_scan_results():
             messagebox.showerror("Open File", f"Failed to open file: {e}")
 
 
-
+#creating a function to save results
 def save_scan_results():
     hide_all_frames()
     text_area = Text(save_scan_frame, wrap='word')
@@ -137,12 +141,13 @@ def save_scan_results():
         except Exception as e:
             messagebox.showerror("Save File", f"Failed to save file: {e}")
 
+#creating a function to exit from the app 
 def exit_app():
     root.quit()
 
-def quick_scan():
-    clear_screen()
-
+# def quick_scan():
+#     clear_screen()
+#creating dummy funtions for menus
 def intense_scan():
     messagebox.showinfo("Intense Scan", "Performing an intense scan...")
 
@@ -304,5 +309,5 @@ def hide_all_frames():
 
 
 
-
+#creating mainloop for window existing.
 root.mainloop()
