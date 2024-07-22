@@ -10,8 +10,11 @@ from datetime import datetime
 
 # Create the main window
 root = Tk()
+height = 600
+width= 600
 root.title("Network Scanner")
 root.geometry("600x600")
+
 
 #function to get local IP and local mac 
 def get_local_ip_and_mac():
@@ -53,7 +56,7 @@ def new_scan():
     subnet_label = Label(new_scan_frame , text = "Entet the Subnet[192.168.18.0/24]")
     subnet_label.pack()
     subnet = Entry(new_scan_frame,width= 20 , textvariable=subnet_var).pack()
-    submit_btn = Button(new_scan_frame,text = "Submit",width = 18 , command=validation_and_scan).pack()
+    scam_btn = Button(new_scan_frame,text = "Scan",width = 18 , command=validation_and_scan).pack()
 
 #ip subnet formating  using regex
 def validate_ip_subnet(ip_subnet):
@@ -107,7 +110,8 @@ def scan():
     table.pack(fill="both", expand=1)
 
     save_btn = Button(new_scan_frame , text = "Save" , command=lambda:save_scan_results(data))
-    save_btn.pack()
+    save_btn = Button(root, text="Save", width=20, height=2, bg="blue", fg="white")
+    save_btn.pack(pady=10)
 
 
 #creating a function to save results
@@ -130,28 +134,40 @@ def save_scan_results(data_list):
 
 
 #creating a open file options  
-
-
 def open_scan_results():
     hide_all_frames()
     open_scan_frame.pack(fill = "both" , expand = 1)
     #createa a text area for notepads
-    text_area = Text(open_scan_frame, wrap='word')
-    text_area.pack(expand=True, fill='both')
+    # text_area = Text(open_scan_frame, wrap='word')
+    # text_area.pack(expand=True, fill='both')
 
     file_path = filedialog.askopenfilename(defaultextension=".txt",
                                            filetypes=[("Text files", "*.txt"),
                                                       ("All files", "*.*")])
+    
     if file_path:
-        try:
-            with open(file_path, 'r') as file:
-                text_area.delete(1.0, END)
-                text_area.insert(END, file.read())
-                text_area.config(state = DISABLED)
-        except Exception as e:
-            messagebox.showerror("Open File", f"Failed to open file: {e}")
+            try:
+                with open(file_path, 'r') as file:
+                    lines = file.readlines()
+                data = []
+                for line in lines:
+                    ip, mac = line.strip().strip('()').split(',')
+                    data.append((ip.strip("'"), mac.strip("'")))
 
+                # Create and display the table
+                columns = ("IP Address", "MAC Address")
+                table = ttk.Treeview(open_scan_frame, columns=columns, show="headings")
+                for col in columns:
+                    table.heading(col, text=col)
+                    table.column(col, anchor="center")
 
+                for row in data:
+                    table.insert("", "end", values=row)
+
+                table.pack(fill="both", expand=1)
+
+            except Exception as e:
+                messagebox.showerror("Open File", f"Failed to open file: {e}")
 #creating a function to exit from the app 
 def exit_app():
     root.quit()
@@ -319,15 +335,15 @@ help_menu.add_command(label="Support", command=support)
 
 #creating some frames
 #frame for new scan
-new_scan_frame = Frame(root,width = 600 , height = 600 )
+new_scan_frame = Frame(root,width = width , height = height )
 #frame for  open scan
-open_scan_frame = Frame(root,width = 600 , height = 600 )
+open_scan_frame = Frame(root,width = width , height = height )
 #frame for save scan result menu
-save_scan_frame = Frame(root,width = 600 , height = 600 )
+save_scan_frame = Frame(root,width = width , height = height )
 #frame for documentation
-documentation_frame = Frame(root, width = 600 , height = 600)
+documentation_frame = Frame(root, width = width , height = height)
 #frame for about 
-about_frame = Frame(root, width = 600 , height = 600 )
+about_frame = Frame(root, width = width , height = height )
 
 #creating a list of frames.
 frame_list = [new_scan_frame,open_scan_frame,save_scan_frame,documentation_frame,about_frame]
