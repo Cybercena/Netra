@@ -147,6 +147,7 @@ def open_scan_results():
             with open(file_path, 'r') as file:
                 text_area.delete(1.0, END)
                 text_area.insert(END, file.read())
+                text_area.config(state = DISABLED)
         except Exception as e:
             messagebox.showerror("Open File", f"Failed to open file: {e}")
 
