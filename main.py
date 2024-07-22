@@ -5,6 +5,7 @@ import ipaddress
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import socket
 import re
+from datetime import datetime
 
 
 # Create the main window
@@ -66,6 +67,8 @@ def validation_and_scan():
     subnet = subnet_var.get()
     if validate_ip_subnet(subnet):
         scan()
+    elif subnet == "":
+        messagebox.showerror("Error","No IP were entered !")
     else:
         messagebox.showerror("Error","The IP address and subnet format is incorrect.")   
 
@@ -73,12 +76,14 @@ def validation_and_scan():
 root.bind('<Return>', lambda event: validation_and_scan())
 
 #creating a actual scan funtion and printing the data
+
 def scan():
     hide_all_frames()
     new_scan_frame.pack(fill="both", expand=1)
-   
+    
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     active_device = Label(new_scan_frame, 
-                          text="Active Devices", 
+                          text=f"Active devices on : {current_time}", 
                           height=3,
                           font=('Helvetica', 14),  # Change font to 'Helvetica' with size 14
                           fg='blue')
@@ -101,11 +106,32 @@ def scan():
 
     table.pack(fill="both", expand=1)
 
+    save_btn = Button(new_scan_frame , text = "Save" , command=lambda:save_scan_results(data))
+    save_btn.pack()
 
 
+#creating a function to save results
+def save_scan_results(data_list):
+    hide_all_frames()
+    text_area = Text(save_scan_frame, wrap='word')
+    text_area.pack(expand=True, fill='both')
+    save_scan_frame.pack(fill = "both" , expand = 1)
+    file_path = filedialog.asksaveasfilename(defaultextension=".txt",
+                                             filetypes=[("Text files", "*.txt"),
+                                                        ("All files", "*.*")])
+    
+    if file_path:
+        try:
+            with open(file_path, 'w') as file:
+                for item in data_list:
+                    file.write(f"{item}\n")
+        except Exception as e:
+            messagebox.showerror("Save File", f"Failed to save file: {e}")
 
 
 #creating a open file options  
+
+
 def open_scan_results():
     hide_all_frames()
     open_scan_frame.pack(fill = "both" , expand = 1)
@@ -124,22 +150,6 @@ def open_scan_results():
         except Exception as e:
             messagebox.showerror("Open File", f"Failed to open file: {e}")
 
-
-#creating a function to save results
-def save_scan_results():
-    hide_all_frames()
-    text_area = Text(save_scan_frame, wrap='word')
-    text_area.pack(expand=True, fill='both')
-    save_scan_frame.pack(fill = "both" , expand = 1)
-    file_path = filedialog.asksaveasfilename(defaultextension=".txt",
-                                             filetypes=[("Text files", "*.txt"),
-                                                        ("All files", "*.*")])
-    if file_path:
-        try:
-            with open(file_path, 'w') as file:
-                file.write(text_area.get(1.0, END))
-        except Exception as e:
-            messagebox.showerror("Save File", f"Failed to save file: {e}")
 
 #creating a function to exit from the app 
 def exit_app():
@@ -207,12 +217,38 @@ def network_settings():
 
 def update():
     messagebox.showinfo("Update", "Checking for updates...")
-
+#fucntion for documentation button
 def documentation():
-    messagebox.showinfo("Documentation", "Opening documentation...")
+    hide_all_frames()
+    documentation_frame.pack(fill="both",expand=1)
 
+    text_widget = Text(documentation_frame,wrap = WORD , height= 10 , width=50)
+    text_widget.pack(fill = BOTH , expand = 1)
+
+    #read the text from documentation file
+    try:
+        with open("documentation.txt","r") as file:
+            documentation_text = file.read()
+    except FileNotFoundError:
+        messagebox.showerror("No Documentation")
+    text_widget.insert(END,documentation_text)
+    text_widget.config(state = DISABLED)
+#function for the about function
 def about():
-    messagebox.showinfo("About", "About this application...")
+    hide_all_frames()
+    about_frame.pack(fill="both",expand=1)
+
+    text_widget = Text(about_frame,wrap = WORD , height= 10 , width=50)
+    text_widget.pack(fill = BOTH , expand = 1)
+
+    #read the text from README.md file
+    try:
+        with open("README.md","r") as file:
+            about_me = file.read()
+    except FileNotFoundError:
+        messagebox.showerror("No Documentation")
+    text_widget.insert(END,about_me)
+    text_widget.config(state = DISABLED)
 
 def support():
     messagebox.showinfo("Support", "Contacting support...")
@@ -229,7 +265,7 @@ file_menu = Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label="File", menu=file_menu)
 file_menu.add_command(label="New Scan", command=new_scan)
 file_menu.add_command(label="Open Scan Results", command=open_scan_results)
-file_menu.add_command(label="Save Scan Results", command=save_scan_results)
+# file_menu.add_command(label="Save Scan Results", command=save_scan_results)
 file_menu.add_separator()
 file_menu.add_command(label="Exit", command=exit_app)
 
@@ -287,10 +323,15 @@ new_scan_frame = Frame(root,width = 600 , height = 600 )
 open_scan_frame = Frame(root,width = 600 , height = 600 )
 #frame for save scan result menu
 save_scan_frame = Frame(root,width = 600 , height = 600 )
-# Start the main event loop
+#frame for documentation
+documentation_frame = Frame(root, width = 600 , height = 600)
+#frame for about 
+about_frame = Frame(root, width = 600 , height = 600 )
 
 #creating a list of frames.
-frame_list = [new_scan_frame,open_scan_frame,save_scan_frame]
+frame_list = [new_scan_frame,open_scan_frame,save_scan_frame,documentation_frame,about_frame]
+
+# frame_list = [new_scan_frame,open_scan_frame]
 
 #functions to hide other frames and deleting widgets
 def hide_all_frames():
@@ -311,3 +352,4 @@ def hide_all_frames():
 
 #creating mainloop for window existing.
 root.mainloop()
+
