@@ -110,8 +110,7 @@ def scan():
     table.pack(fill="both", expand=1)
 
     save_btn = Button(new_scan_frame , text = "Save" , command=lambda:save_scan_results(data))
-    save_btn = Button(root, text="Save", width=20, height=2, bg="blue", fg="white")
-    save_btn.pack(pady=10)
+    save_btn.pack()
 
 
 #creating a function to save results
