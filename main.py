@@ -370,4 +370,3 @@ def hide_all_frames():
 
 #creating mainloop for window existing.
 root.mainloop()
-
