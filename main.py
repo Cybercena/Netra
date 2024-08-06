@@ -169,6 +169,11 @@ def open_scan_results():
 
             except Exception as e:
                 messagebox.showerror("Open File", f"Failed to open file: {e}")
+
+#creating a port scanning functin
+def port_scanner():
+    hide_all_frames()
+    port_scan_frame.pack(fill = "both",expand = 1)
 #creating a function to exit from the app 
 def exit_app():
     root.quit()
@@ -200,8 +205,8 @@ def stop_scan():
 def ip_lookup():
     messagebox.showinfo("IP Lookup", "Looking up IP address...")
 
-def port_scanner():
-    messagebox.showinfo("Port Scanner", "Scanning ports...")
+
+    
 
 def ping():
     messagebox.showinfo("Ping", "Pinging IP address...")
@@ -235,7 +240,7 @@ def network_settings():
 
 def update():
     messagebox.showinfo("Update", "Checking for updates...")
-#fucntion for documentation button
+
 def documentation():
     hide_all_frames()
     documentation_frame.pack(fill="both",expand=1)
@@ -286,6 +291,15 @@ file_menu.add_command(label="Open Scan Results", command=open_scan_results)
 # file_menu.add_command(label="Save Scan Results", command=save_scan_results)
 file_menu.add_separator()
 file_menu.add_command(label="Exit", command=exit_app)
+
+#Tools menu
+tools_menu = Menu(menu_bar, tearoff=0)
+menu_bar.add_cascade(label="Tools", menu=tools_menu)
+tools_menu.add_command(label="Port Scanning", command=port_scanner)
+tools_menu.add_command(label="Ip lookup", command=documentation)
+
+
+
 
 # # Scan Menu
 # scan_menu = Menu(menu_bar, tearoff=0)
@@ -341,13 +355,16 @@ new_scan_frame = Frame(root,width = width , height = height )
 open_scan_frame = Frame(root,width = width , height = height )
 #frame for save scan result menu
 save_scan_frame = Frame(root,width = width , height = height )
+
+#frame for port scanning 
+port_scan_frame = Frame(root,width = width , height=height , background= "red")
 #frame for documentation
 documentation_frame = Frame(root, width = width , height = height)
 #frame for about 
 about_frame = Frame(root, width = width , height = height )
 
 #creating a list of frames.
-frame_list = [new_scan_frame,open_scan_frame,save_scan_frame,documentation_frame,about_frame]
+frame_list = [new_scan_frame,open_scan_frame,save_scan_frame,documentation_frame,about_frame,port_scan_frame]
 
 # frame_list = [new_scan_frame,open_scan_frame]
 
