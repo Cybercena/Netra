@@ -8,19 +8,32 @@ import re
 from datetime import datetime
 
 
-# Create the main window
+# Create the main window and initialize the value for height and width with title for the window 
 root = Tk()
 height = 600
 width= 600
-root.title("Network Scanner")
+root.title("NETRA")
 root.geometry("600x600")
 
 
-#function to get local IP and local mac 
+#function to get local ip of own device
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    except OSError:
+        ip = None
+    finally:
+        s.close()
+    return ip
+#function to get the mac address of own device
+def get_mac_add():
+    pass
+#single function to get the local ip and mac address, we add stattic add due to some problems
 def get_local_ip_and_mac():
-    hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
-    local_mac = "AA:BB:CC:DD:DD:FF"
+    local_ip = get_local_ip()
+    local_mac = "aa:bb:c1:3a:7e:b1"
     return local_ip, local_mac
 
 #function to create and send ARP request
@@ -58,7 +71,7 @@ def new_scan():
     subnet_label = Label(new_scan_frame , text = "Entet the Subnet[192.168.18.0/24]")
     subnet_label.pack()
     subnet = Entry(new_scan_frame,width= 20 , textvariable=subnet_var).pack()
-    scam_btn = Button(new_scan_frame,text = "Scan",width = 18 , command=validation_and_scan).pack()
+    scan_btn = Button(new_scan_frame,text = "Scan",width = 18 , command=validation_and_scan).pack()
 
 #ip subnet formating  using regex
 def validate_ip_subnet(ip_subnet):
@@ -170,13 +183,90 @@ def open_scan_results():
             except Exception as e:
                 messagebox.showerror("Open File", f"Failed to open file: {e}")
 
-#creating a port scanning functin
-def port_scanner():
-    hide_all_frames()
-    port_scan_frame.pack(fill = "both",expand = 1)
+ 
+
+
 #creating a function to exit from the app 
 def exit_app():
     root.quit()
+#working on the port scanner 
+ # Creating variables for inputs
+target_for_portscan = StringVar()
+scan_type = StringVar()
+protocol_type = StringVar()
+
+# Creating the port scanning UI
+def port_scanner():
+    hide_all_frames()
+    port_scan_frame.pack(fill="both", expand=1)
+
+    # Target IP Label and Entry
+    target_ip_label = Label(port_scan_frame, text="Target IP:")
+    target_ip_label.grid(row=1, column=0)
+    global target_ip_entry
+    target_ip_entry = Entry(port_scan_frame, width=18, textvariable=target_for_portscan)
+    target_ip_entry.grid(row=1, column=1)
+
+    # Scan Type Drop-down Menu
+    scan_type_label = Label(port_scan_frame, text="Scan Type:")
+    scan_type_label.grid(row=2, column=0)
+    global scan_type_combobox
+    scan_type_combobox = ttk.Combobox(port_scan_frame, values=["Single Port", "Multiple Ports", "Range of Ports"], state='readonly')
+    scan_type_combobox.set("Single Port")
+    scan_type_combobox.grid(row=2, column=1, padx=5, pady=5)
+
+    # Port Label and Entry Box
+    port_input_label = Label(port_scan_frame, text="Port(s):")
+    port_input_label.grid(row=3, column=0)
+    global port_input_box
+    port_input_box = Entry(port_scan_frame, width=24)
+    port_input_box.grid(row=3, column=1)
+
+    # Protocol Drop-down Menu
+    protocol_label = Label(port_scan_frame, text="Protocol:")
+    protocol_label.grid(row=4, column=0, padx=5, pady=5)
+    global protocol_combobox
+    protocol_combobox = ttk.Combobox(port_scan_frame, values=["TCP", "UDP", "SYN"], state='readonly')
+    protocol_combobox.set("TCP")
+    protocol_combobox.grid(row=4, column=1, padx=5, pady=5)
+
+    # Scan Button
+    port_scan_button = Button(port_scan_frame, text="Start Scan", command=validation_and_port_scan)
+    port_scan_button.grid(row=5, column=1)
+
+# Function to validate the IP address
+def validate_target_ip(target):
+    pattern = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
+    return pattern.match(target)
+
+# Function to validate and perform port scanning
+def validation_and_port_scan():
+    global scan_type_combobox, protocol_combobox, target_for_portscan
+    
+    scan_type_value = scan_type_combobox.get()
+    protocol_type_value = protocol_combobox.get()
+    target = target_for_portscan.get()
+
+    if validate_target_ip(target):
+        port_scan(scan_type_value, protocol_type_value, target)
+    elif target == "":
+        messagebox.showerror("Error", "No IP was entered!")
+    else:
+        messagebox.showerror("Error", "The IP address format is incorrect.")
+
+# Function to perform port scanning (dummy implementation)
+def port_scan(scan_type, protocol_type, target):
+    if scan_type == "Single Port":
+        print(f"Single Port Scan on {target} using {protocol_type} protocol")
+    elif scan_type == "Multiple Ports":
+        print(f"Multiple Ports Scan on {target} using {protocol_type} protocol")
+    elif scan_type == "Range of Ports":
+        print(f"Range of Ports Scan on {target} using {protocol_type} protocol")
+    else:
+        print("Unknown scan type")
+
+
+
 
 # def quick_scan():
 #     clear_screen()
@@ -187,8 +277,6 @@ def intense_scan():
 def ping_scan():
     messagebox.showinfo("Ping Scan", "Performing a ping scan...")
 
-def port_scan():
-    messagebox.showinfo("Port Scan", "Performing a port scan...")
 
 def udp_scan():
     messagebox.showinfo("UDP Scan", "Performing a UDP scan...")
@@ -357,7 +445,7 @@ open_scan_frame = Frame(root,width = width , height = height )
 save_scan_frame = Frame(root,width = width , height = height )
 
 #frame for port scanning 
-port_scan_frame = Frame(root,width = width , height=height , background= "red")
+port_scan_frame = Frame(root,width = width , height=height )
 #frame for documentation
 documentation_frame = Frame(root, width = width , height = height)
 #frame for about 
